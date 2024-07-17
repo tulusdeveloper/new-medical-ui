@@ -148,7 +148,7 @@ function PatientList() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
-        <h2 className="text-3xl font-semibold">Patient Management</h2>
+        <h2 className="text-3xl font-semibold text-gray-800">Patient Management</h2>
         <div className="space-x-4">
           <Link
             className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors duration-300 inline-flex items-center"
@@ -221,7 +221,7 @@ function PatientList() {
               {sortedGroups.map(group => (
                 <div key={group} className="bg-white shadow-md rounded-lg overflow-hidden">
                   <button
-                    className="w-full bg-gray-100 px-4 py-3 text-left font-medium flex justify-between items-center"
+                    className="w-full bg-gray-100 px-4 py-3 text-left font-medium flex justify-between items-center text-gray-800"
                     onClick={() => toggleGroup(group)}
                   >
                     Last Name: {group}
@@ -283,8 +283,8 @@ function PatientList() {
                               </tr>
                               {expandedDetails[patient.id] && (
                                 <tr>
-                                  <td colSpan={7} className="bg-gray-50 px-6 py-4">
-                                    <div className="grid grid-cols-2 gap-4">
+                                  <td colSpan={7} className="bg-gray-50 px-6 py-4 text-gray-800">
+                                    <div className="grid grid-cols-2 gap-4 ">
                                       <div>
                                         <p><strong>Address:</strong> {patient.address || 'N/A'}</p>
                                         <p><strong>Emergency Contact:</strong> {patient.emergency_contact || 'N/A'}</p>
@@ -300,6 +300,8 @@ function PatientList() {
                           ))}
                         </tbody>
                       </table>
+
+                      
                     </div>
                   )}
                 </div>
