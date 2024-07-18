@@ -105,7 +105,7 @@ function PatientRegistration({ onCancel, onRegistrationSuccess }: PatientRegistr
               value={newPatient.first_name}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+              className="mt-1 block w-full rounded-md text-gray-900 border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
             />
           </div>
           <div>
@@ -121,7 +121,7 @@ function PatientRegistration({ onCancel, onRegistrationSuccess }: PatientRegistr
               name="other_names"
               value={newPatient.other_names}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-gray-900"
             />
           </div>
           <div>
@@ -138,7 +138,7 @@ function PatientRegistration({ onCancel, onRegistrationSuccess }: PatientRegistr
               value={newPatient.last_name}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-gray-900"
             />
           </div>
           <div>
@@ -154,7 +154,7 @@ function PatientRegistration({ onCancel, onRegistrationSuccess }: PatientRegistr
               value={newPatient.gender}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-gray-900"
             >
               <option value="">Select gender</option>
               <option value="M">Male</option>
@@ -176,7 +176,7 @@ function PatientRegistration({ onCancel, onRegistrationSuccess }: PatientRegistr
               value={newPatient.date_of_birth}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-gray-900"
             />
           </div>
         </div>
@@ -198,7 +198,7 @@ function PatientRegistration({ onCancel, onRegistrationSuccess }: PatientRegistr
               name="national_id"
               value={newPatient.national_id}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-gray-900"
             />
           </div>
           <div>
@@ -215,7 +215,7 @@ function PatientRegistration({ onCancel, onRegistrationSuccess }: PatientRegistr
               value={newPatient.primary_phone}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-gray-900"
             />
           </div>
           <div>
@@ -231,7 +231,7 @@ function PatientRegistration({ onCancel, onRegistrationSuccess }: PatientRegistr
               name="secondary_phone"
               value={newPatient.secondary_phone}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-gray-900"
             />
           </div>
           <div>
@@ -247,7 +247,7 @@ function PatientRegistration({ onCancel, onRegistrationSuccess }: PatientRegistr
               name="email"
               value={newPatient.email}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-gray-900"
             />
           </div>
           <div>
@@ -342,7 +342,7 @@ function PatientRegistration({ onCancel, onRegistrationSuccess }: PatientRegistr
               name="blood_type"
               value={newPatient.blood_type}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+              className="mt-1 block w-full rounded-md border-blue-200 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-gray-900"
             >
               <option value="">Select blood type</option>
               <option value="A+">A+</option>
