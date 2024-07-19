@@ -38,6 +38,12 @@ const initialStats: DashboardStats = {
   departmentStats: { totalDepartments: 0 },
 };
 
+interface Patient {
+  gender: string;
+  dateOfBirth: string;
+  // Add other patient properties as needed
+}
+
 const Dashboard: React.FC = () => {
   const [stats, setStats] = useState<DashboardStats>(initialStats);
   const [loading, setLoading] = useState(true);
@@ -46,7 +52,14 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const [labClassesResponse, labTestsResponse, patientsResponse, insurancesResponse, visitTypesResponse, departmentsResponse] = await Promise.all([
+        const [
+          labClassesResponse,
+          labTestsResponse,
+          patientsResponse,
+          insurancesResponse,
+          visitTypesResponse,
+          departmentsResponse
+        ] = await Promise.all([
           laboratoryApi.fetchLabTestClasses(),
           laboratoryApi.fetchLabTests(),
           patientsApi.fetchPatients(),
@@ -55,35 +68,36 @@ const Dashboard: React.FC = () => {
           departmentApi.fetchDepartments()
         ]);
     
-        // Extract the data from the responses
-        const labClasses = labClassesResponse.data;
-        const labTests = labTestsResponse.data;
-        const patients = patientsResponse.data;
-        const insurances = insurancesResponse.data;
-        const visitTypes = visitTypesResponse.data;
-        const departments = departmentsResponse.data;
+        // Extract the counts from the data property of each response
+        const labClassesCount = labClassesResponse.data.length;
+        const labTestsCount = labTestsResponse.data.length;
+        const patientsCount = patientsResponse.data.length;
+        const insurancesCount = insurancesResponse.data.length;
+        const visitTypesCount = visitTypesResponse.data.length;
+        const departmentsCount = departmentsResponse.data.length;
     
-        console.log('Processed API responses:', { labClasses, labTests, patients, insurances, visitTypes, departments });
+        console.log('API response counts:', { 
+          labClassesCount, 
+          labTestsCount, 
+          patientsCount, 
+          insurancesCount, 
+          visitTypesCount, 
+          departmentsCount 
+        });
     
-        const genderDistribution = calculateGenderDistribution(patients);
-        const ageDistribution = calculateAgeDistribution(patients);
-    
-  
-        console.log('Processed distributions:', { genderDistribution, ageDistribution });
-  
         const newStats: DashboardStats = {
           labStats: { 
-            totalClasses: Array.isArray(labClasses) ? labClasses.length : 0,
-            totalTests: Array.isArray(labTests) ? labTests.length : 0
+            totalClasses: labClassesCount,
+            totalTests: labTestsCount
           },
           patientStats: {
-            totalPatients: Array.isArray(patients) ? patients.length : 0,
-            genderDistribution,
-            ageDistribution,
+            totalPatients: patientsCount,
+            genderDistribution: calculateGenderDistribution(patientsResponse.data),
+            ageDistribution: calculateAgeDistribution(patientsResponse.data),
           },
-          insuranceStats: { totalInsurances: Array.isArray(insurances) ? insurances.length : 0 },
-          visitTypeStats: { totalVisitTypes: Array.isArray(visitTypes) ? visitTypes.length : 0 },
-          departmentStats: { totalDepartments: Array.isArray(departments) ? departments.length : 0 },
+          insuranceStats: { totalInsurances: insurancesCount },
+          visitTypeStats: { totalVisitTypes: visitTypesCount },
+          departmentStats: { totalDepartments: departmentsCount },
         };
         
         console.log('New stats to be set:', newStats);
@@ -99,54 +113,17 @@ const Dashboard: React.FC = () => {
   
     fetchDashboardData();
   }, []);
-
-  useEffect(() => {
-    console.log('Stats in render:', stats);
-  }, [stats]);
-
-  interface Patient {
-    gender: string;
-    dateOfBirth: string;
-    // Add other patient properties as needed
-  }
   
-  const calculateGenderDistribution = (patients: any): { gender: string; count: number }[] => {
-    if (!Array.isArray(patients)) {
-      console.error('Expected patients to be an array, but received:', patients);
-      return [];
-    }
-  
-    const distribution = patients.reduce((acc, patient: Patient) => {
-      if (typeof patient !== 'object' || patient === null) {
-        console.error('Invalid patient data:', patient);
-        return acc;
-      }
-  
-      const gender = patient.gender;
-      if (typeof gender !== 'string') {
-        console.error('Invalid gender data for patient:', patient);
-        return acc;
-      }
-  
-      acc[gender] = (acc[gender] || 0) + 1;
+  const calculateGenderDistribution = (patients: Patient[]): { gender: string; count: number }[] => {
+    const distribution = patients.reduce((acc, patient) => {
+      acc[patient.gender] = (acc[patient.gender] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
-  
-    return Object.entries(distribution).map(([gender, count]) => {
-      if (typeof count !== 'number') {
-        console.error(`Invalid count for gender ${gender}:`, count);
-        return { gender, count: 0 };
-      }
-      return { gender, count };
-    });
+
+    return Object.entries(distribution).map(([gender, count]) => ({ gender, count }));
   };
 
-  const calculateAgeDistribution = (patients: any): { ageGroup: string; count: number }[] => {
-    if (!Array.isArray(patients)) {
-      console.error('Expected patients to be an array, but received:', patients);
-      return [];
-    }
-
+  const calculateAgeDistribution = (patients: Patient[]): { ageGroup: string; count: number }[] => {
     const ageGroups = {
       '0-18': 0,
       '19-30': 0,
@@ -155,12 +132,7 @@ const Dashboard: React.FC = () => {
       '71+': 0
     };
 
-    patients.forEach((patient: Patient) => {
-      if (typeof patient !== 'object' || patient === null || typeof patient.dateOfBirth !== 'string') {
-        console.error('Invalid patient data:', patient);
-        return;
-      }
-
+    patients.forEach((patient) => {
       const age = calculateAge(patient.dateOfBirth);
       if (age <= 18) ageGroups['0-18']++;
       else if (age <= 30) ageGroups['19-30']++;
