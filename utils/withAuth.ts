@@ -1,3 +1,4 @@
+"use client"
 import React, { ComponentType } from 'react';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
