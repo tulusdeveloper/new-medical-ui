@@ -2,7 +2,9 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { logout } from '@/utils/api';
+// import { logout } from '@/utils/api';
+import LogoutButton from '@/components/LogoutButton';
+
 import {
   Home,
   Calendar,
@@ -62,12 +64,12 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
 
   const router = useRouter();
 
-  const handleLogout = () => {
-    if (window.confirm("Are you sure you want to log out?")) {
-      logout();
-      router.push("/auth/login");
-    }
-  };
+  // const handleLogout = () => {
+  //   if (window.confirm("Are you sure you want to log out?")) {
+  //     logout();
+  //     router.push("/auth/login");
+  //   }
+  // };
 
   return (
     <div
@@ -125,15 +127,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
           />
           {!isCollapsed && <span className="font-medium">Menu</span>}
         </a>
-        <button
-          onClick={handleLogout}
-          className={`flex items-center px-4 py-3 w-full text-left text-red-600 hover:bg-red-50 transition-colors ${
-            isCollapsed ? "justify-center" : ""
-          }`}
-        >
-          <LogOut className={`w-5 h-5 ${isCollapsed ? "" : "mr-3"}`} />
-          {!isCollapsed && <span className="font-medium">Log Out</span>}
-        </button>
+        <LogoutButton isCollapsed={isCollapsed} />
       </div>
       {!isMobile && (
         <button

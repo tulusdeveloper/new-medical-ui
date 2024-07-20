@@ -247,7 +247,6 @@ const logout = (): void => {
   if (typeof window !== 'undefined') {
     localStorage.removeItem('token');
     api.defaults.headers.common['Authorization'] = null;
-    window.location.href = '/auth/login';
   }
 };
 
