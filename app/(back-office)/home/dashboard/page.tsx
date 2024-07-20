@@ -53,12 +53,12 @@ const Dashboard: React.FC = () => {
     const fetchDashboardData = async () => {
       try {
         const [
-          labClassesResponse,
-          labTestsResponse,
-          patientsResponse,
-          insurancesResponse,
-          visitTypesResponse,
-          departmentsResponse
+          labClasses,
+          labTests,
+          patients,
+          insurances,
+          visitTypes,
+          departments
         ] = await Promise.all([
           laboratoryApi.fetchLabTestClasses(),
           laboratoryApi.fetchLabTests(),
@@ -68,13 +68,31 @@ const Dashboard: React.FC = () => {
           departmentApi.fetchDepartments()
         ]);
     
-        // Extract the counts from the data property of each response
-        const labClassesCount = labClassesResponse.data.length;
-        const labTestsCount = labTestsResponse.data.length;
-        const patientsCount = patientsResponse.data.length;
-        const insurancesCount = insurancesResponse.data.length;
-        const visitTypesCount = visitTypesResponse.data.length;
-        const departmentsCount = departmentsResponse.data.length;
+        console.log('Raw API responses:', {
+          labClasses,
+          labTests,
+          patients,
+          insurances,
+          visitTypes,
+          departments
+        });
+    
+        // Safely access the data, assuming it might be nested in a 'data' property
+        const getDataSafely = (response: any) => response?.data ?? response ?? [];
+    
+        const labClassesData = getDataSafely(labClasses);
+        const labTestsData = getDataSafely(labTests);
+        const patientsData = getDataSafely(patients);
+        const insurancesData = getDataSafely(insurances);
+        const visitTypesData = getDataSafely(visitTypes);
+        const departmentsData = getDataSafely(departments);
+    
+        const labClassesCount = labClassesData.length;
+        const labTestsCount = labTestsData.length;
+        const patientsCount = patientsData.length;
+        const insurancesCount = insurancesData.length;
+        const visitTypesCount = visitTypesData.length;
+        const departmentsCount = departmentsData.length;
     
         console.log('API response counts:', { 
           labClassesCount, 
@@ -92,8 +110,8 @@ const Dashboard: React.FC = () => {
           },
           patientStats: {
             totalPatients: patientsCount,
-            genderDistribution: calculateGenderDistribution(patientsResponse.data),
-            ageDistribution: calculateAgeDistribution(patientsResponse.data),
+            genderDistribution: calculateGenderDistribution(patientsData),
+            ageDistribution: calculateAgeDistribution(patientsData),
           },
           insuranceStats: { totalInsurances: insurancesCount },
           visitTypeStats: { totalVisitTypes: visitTypesCount },
@@ -115,15 +133,25 @@ const Dashboard: React.FC = () => {
   }, []);
   
   const calculateGenderDistribution = (patients: Patient[]): { gender: string; count: number }[] => {
+    if (!Array.isArray(patients) || patients.length === 0) {
+      console.warn('No patients data available for gender distribution');
+      return [];
+    }
+    
     const distribution = patients.reduce((acc, patient) => {
       acc[patient.gender] = (acc[patient.gender] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
-
+  
     return Object.entries(distribution).map(([gender, count]) => ({ gender, count }));
   };
-
+  
   const calculateAgeDistribution = (patients: Patient[]): { ageGroup: string; count: number }[] => {
+    if (!Array.isArray(patients) || patients.length === 0) {
+      console.warn('No patients data available for age distribution');
+      return [];
+    }
+  
     const ageGroups = {
       '0-18': 0,
       '19-30': 0,
@@ -131,7 +159,7 @@ const Dashboard: React.FC = () => {
       '51-70': 0,
       '71+': 0
     };
-
+  
     patients.forEach((patient) => {
       const age = calculateAge(patient.dateOfBirth);
       if (age <= 18) ageGroups['0-18']++;
@@ -140,7 +168,7 @@ const Dashboard: React.FC = () => {
       else if (age <= 70) ageGroups['51-70']++;
       else ageGroups['71+']++;
     });
-
+  
     return Object.entries(ageGroups).map(([ageGroup, count]) => ({ ageGroup, count }));
   };
 
