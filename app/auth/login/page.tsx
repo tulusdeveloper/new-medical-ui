@@ -11,6 +11,7 @@ export default function Login() {
   const [usernameOrEmail, setUsernameOrEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [staySignedIn, setStaySignedIn] = useState(false);
   const router = useRouter();
@@ -18,13 +19,17 @@ export default function Login() {
   const handleSubmit = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
     setError('');
+    setSuccessMessage('');
     setIsLoading(true);
     try {
       const response = await api.post('token/', { username: usernameOrEmail, password });
       const data = response.data;
       localStorage.setItem('token', data.access);
       api.defaults.headers.common['Authorization'] = `Bearer ${data.access}`;
-      router.push('/home/dashboard');
+      setSuccessMessage('Login successful! Redirecting to dashboard...');
+      setTimeout(() => {
+        router.push('/home/dashboard');
+      }, 2000); // Redirect after 2 seconds
     } catch (err) {
       console.error('Login error:', err);
       setError('Invalid username/email or password');
@@ -42,7 +47,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex bg-gradient-to-r from-blue-400 via-teal-500 to-green-500">
-      <div className="hidden lg:flex lg:w-1/2 bg-cover bg-center" style={{backgroundImage: "url('/login1.webp')"}}></div>
+      <div className="hidden lg:flex lg:w-1/2 bg-cover bg-center" style={{backgroundImage: "url('/login2.webp')"}}></div>
       <div className="w-full lg:w-1/2 flex items-center justify-center px-4">
         <motion.div 
           initial={{ opacity: 0, y: 50 }}
@@ -138,7 +143,16 @@ export default function Login() {
                 </Link>
               </div>
             </div>
-            {error && <p className="text-red-500 text-sm">{error}</p>}
+            {successMessage && (
+              <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                <span className="block sm:inline">{successMessage}</span>
+              </div>
+            )}
+            {error && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                <span className="block sm:inline">{error}</span>
+              </div>
+            )}
             <div>
               <button
                 type="submit"
