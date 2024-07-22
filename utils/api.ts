@@ -65,6 +65,8 @@ const authenticatedRequest = async <T>(apiCall: () => Promise<T>): Promise<T> =>
 
 // Define interfaces for API functions
 interface LabTestClass {
+  category: any;
+  is_active: boolean;
   id?: number;
   name: string;
   description?: string;
@@ -151,7 +153,10 @@ interface DepartmentPermission {
 // Laboratory API functions
 const laboratoryApi = {
   // Lab Test Classes CRUD
-  fetchLabTestClasses: () => authenticatedRequest<LabTestClass[]>(() => api.get('laboratory/lab-test-classes/')),
+  fetchLabTestClasses: async (): Promise<LabTestClass[]> => {
+    const response = await api.get<LabTestClass[]>('laboratory/lab-test-classes/');
+    return response.data;
+  },
   createLabTestClass: (data: LabTestClass) => authenticatedRequest<LabTestClass>(() => api.post('laboratory/lab-test-classes/', data)),
   updateLabTestClass: (id: number, data: LabTestClass) => authenticatedRequest<LabTestClass>(() => api.put(`laboratory/lab-test-classes/${id}/`, data)),
   deleteLabTestClass: (id: number) => authenticatedRequest<void>(() => api.delete(`laboratory/lab-test-classes/${id}/`)),

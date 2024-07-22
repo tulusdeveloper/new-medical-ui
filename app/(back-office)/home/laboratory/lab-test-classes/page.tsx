@@ -31,9 +31,17 @@ function LabTestClassesPage() {
   const fetchLabTestClasses = async () => {
     setIsLoading(true);
     try {
-      const response = await laboratoryApi.fetchLabTestClasses();
-      console.log('API response:', response);
-      setLabTestClasses(response.data); // Access the data property here
+      const data = await laboratoryApi.fetchLabTestClasses();
+      const processedData: LabTestClass[] = data
+        .filter((cls): cls is Required<typeof cls> => cls.id !== undefined)
+        .map(cls => ({
+          id: cls.id,
+          name: cls.name,
+          description: cls.description || '',
+          is_active: cls.is_active ?? true,
+          category: cls.category
+        }));
+      setLabTestClasses(processedData);
       setError(null);
     } catch (error) {
       console.error('Error fetching lab test classes:', error);
@@ -43,6 +51,7 @@ function LabTestClassesPage() {
       setIsLoading(false);
     }
   };
+
 
   const handleEdit = (labTestClass: LabTestClass) => {
     setSelectedLabTestClass(labTestClass);
@@ -73,10 +82,6 @@ function LabTestClassesPage() {
   };
 
   const filteredClasses = useMemo(() => {
-    if (!Array.isArray(labTestClasses)) {
-      console.error('labTestClasses is not an array:', labTestClasses);
-      return [];
-    }
     return labTestClasses.filter((labTestClass) =>
       labTestClass.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       labTestClass.description.toLowerCase().includes(searchTerm.toLowerCase())

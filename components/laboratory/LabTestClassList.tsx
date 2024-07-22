@@ -67,7 +67,7 @@ const LabTestClassList: React.FC<LabTestClassListProps> = ({ labTestClasses, onE
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {classes.map((labTestClass) => (
-                    <tr key={labTestClass.id} className="hover:bg-gray-50 transition-colors duration-150 ease-in-out">
+                    <tr key={labTestClass.id} className="hover:bg-gray-50 transition-colors duration-150 ease-in-out text-slate-950">
                       <td className="py-4 px-4 whitespace-nowrap">{labTestClass.name}</td>
                       <td className="py-4 px-4">
                         <button
