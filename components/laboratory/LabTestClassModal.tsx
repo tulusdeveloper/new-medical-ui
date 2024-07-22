@@ -1,17 +1,30 @@
 "use client"
 import { laboratoryApi } from '@/utils/api';
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { X } from 'lucide-react';
 
-const LabTestClassModal = ({ isOpen, onClose, onSuccess, initialData = null }) => {
-  const [formData, setFormData] = useState({
+interface LabTestClass {
+  id?: number;
+  name: string;
+  description: string;
+  is_active: boolean;
+}
+
+interface LabTestClassModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
+  initialData?: LabTestClass | null;
+}
+
+const LabTestClassModal: React.FC<LabTestClassModalProps> = ({ isOpen, onClose, onSuccess, initialData = null }) => {
+  const [formData, setFormData] = useState<LabTestClass>({
     name: '',
     description: '',
     is_active: true
   });
-  const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -27,21 +40,21 @@ const LabTestClassModal = ({ isOpen, onClose, onSuccess, initialData = null }) =
     }
   }, [isOpen, initialData]);
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value, type } = e.target;
     setFormData(prevData => ({
       ...prevData,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
     }));
   };
 
-  const validateForm = () => {
-    let tempErrors = {};
+  const validateForm = (): Record<string, string> => {
+    let tempErrors: Record<string, string> = {};
     if (!formData.name.trim()) tempErrors.name = "Name is required";
     return tempErrors;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const tempErrors = validateForm();
     setErrors(tempErrors);
@@ -49,7 +62,7 @@ const LabTestClassModal = ({ isOpen, onClose, onSuccess, initialData = null }) =
     if (Object.keys(tempErrors).length === 0) {
       setIsLoading(true);
       try {
-        if (initialData) {
+        if (initialData && initialData.id) {
           await laboratoryApi.updateLabTestClass(initialData.id, formData);
         } else {
           await laboratoryApi.createLabTestClass(formData);
@@ -66,7 +79,7 @@ const LabTestClassModal = ({ isOpen, onClose, onSuccess, initialData = null }) =
   };
 
   const handleDelete = async () => {
-    if (window.confirm('Are you sure you want to delete this lab test class?')) {
+    if (initialData && initialData.id && window.confirm('Are you sure you want to delete this lab test class?')) {
       setIsLoading(true);
       try {
         await laboratoryApi.deleteLabTestClass(initialData.id);
@@ -123,7 +136,7 @@ const LabTestClassModal = ({ isOpen, onClose, onSuccess, initialData = null }) =
               value={formData.description}
               onChange={handleChange}
               className="w-full p-2 border rounded"
-              rows="3"
+              rows={3}
             ></textarea>
           </div>
           <div className="mb-4">
