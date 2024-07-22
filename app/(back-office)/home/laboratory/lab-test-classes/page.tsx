@@ -29,18 +29,24 @@ function LabTestClassesPage() {
   }, []);
 
   const fetchLabTestClasses = async () => {
-    setIsLoading(true);
-    try {
-      const response = await laboratoryApi.fetchLabTestClasses();
-      setLabTestClasses(response.data);
-      setError(null);
-    } catch (error) {
-      console.error('Error fetching lab test classes:', error);
-      setError("Failed to fetch lab test classes. Please try again later.");
-    } finally {
-      setIsLoading(false);
+  setIsLoading(true);
+  try {
+    const response = await laboratoryApi.fetchLabTestClasses();
+    // Check if response is an array
+    if (Array.isArray(response)) {
+      setLabTestClasses(response);
+    } else {
+      console.error('Unexpected response format:', response);
+      setError("Received unexpected data format from the server.");
     }
-  };
+    setError(null);
+  } catch (error) {
+    console.error('Error fetching lab test classes:', error);
+    setError("Failed to fetch lab test classes. Please try again later.");
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const handleEdit = (labTestClass: LabTestClass) => {
     setSelectedLabTestClass(labTestClass);

@@ -1,16 +1,16 @@
 import React from 'react';
 import Link from 'next/link';
 import { FlaskConical, Beaker, ClipboardList, ClipboardCheck, FileText, ChevronRight } from 'lucide-react';
+import { Counts } from '@/app/(back-office)/home/laboratory/page'; // Make sure to export the Counts type from LaboratorySetup
 
-// Define the structure of a laboratory module
+
 interface LaboratoryModule {
   text: string;
   href: string;
   icon: React.ComponentType<{ className?: string }>;
-  apiPath: string;
+  apiPath: keyof Counts;
 }
 
-// Define the array of laboratory modules
 const laboratoryModules: LaboratoryModule[] = [
   { text: "Lab Test Classes", href: "/home/laboratory/lab-test-classes", icon: FlaskConical, apiPath: "labTestClasses" },
   { text: "Lab Tests", href: "/home/laboratory/lab-tests", icon: Beaker, apiPath: "labTests" },
@@ -19,9 +19,8 @@ const laboratoryModules: LaboratoryModule[] = [
   { text: "Lab Results", href: "/home/laboratory/lab-results", icon: FileText, apiPath: "labResults" },
 ];
 
-// Define the props for the LaboratoryDashboard component
 interface LaboratoryDashboardProps {
-  counts: Record<string, number>;
+  counts: Counts;
 }
 
 const LaboratoryDashboard: React.FC<LaboratoryDashboardProps> = ({ counts }) => {
@@ -31,7 +30,7 @@ const LaboratoryDashboard: React.FC<LaboratoryDashboardProps> = ({ counts }) => 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {laboratoryModules.map((module, index) => {
           const Icon = module.icon;
-          const count = counts[module.apiPath] ?? 'Loading...';
+          const count = counts[module.apiPath];
 
           return (
             <div key={index} className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg">

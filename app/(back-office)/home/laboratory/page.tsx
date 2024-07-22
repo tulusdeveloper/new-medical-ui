@@ -4,7 +4,13 @@ import LaboratoryDashboard from '@/components/laboratory/LaboratoryDashboard';
 import { laboratoryApi } from '@/utils/api';
 import withAuth from '@/utils/withAuth';
 
-type Counts = Record<string, number>;
+export type Counts = {
+  labTestClasses: number;
+  labTests: number;
+  labTestFormats: number;
+  labOrders: number;
+  labResults: number;
+};
 
 const LaboratorySetup: React.FC = () => {
   const [counts, setCounts] = useState<Counts>({
@@ -36,32 +42,56 @@ const LaboratorySetup: React.FC = () => {
         laboratoryApi.fetchLabOrders(),
         laboratoryApi.fetchLabResults(),
       ]);
-  
-      setCounts({
-        labTestClasses: labTestClasses.length,
-        labTests: labTests.length,
-        labTestFormats: labTestFormats.length,
-        labOrders: labOrders.length,
-        labResults: labResults.length,
+
+      console.log('Raw API responses:', {
+        labTestClasses,
+        labTests,
+        labTestFormats,
+        labOrders,
+        labResults
       });
+
+      const getDataSafely = (response: any) => response?.data ?? response ?? [];
+
+      const newCounts: Counts = {
+        labTestClasses: getDataSafely(labTestClasses).length,
+        labTests: getDataSafely(labTests).length,
+        labTestFormats: getDataSafely(labTestFormats).length,
+        labOrders: getDataSafely(labOrders).length,
+        labResults: getDataSafely(labResults).length,
+      };
+
+      console.log('New counts to be set:', newCounts);
+      setCounts(newCounts);
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching counts:', error);
-      setError('Failed to fetch laboratory data. Please try again later.');
+      console.error('Detailed error:', error);
+      setError(error instanceof Error ? error.message : 'An unknown error occurred');
       setLoading(false);
     }
   };
 
+  const handleRefresh = () => {
+    setLoading(true);
+    fetchCounts();
+  };
+
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <div className="text-red-500 text-center mt-4">{error}</div>;
   }
 
   return (
     <div>
+      <button 
+        onClick={handleRefresh} 
+        className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+      >
+        Refresh Data
+      </button>
       <LaboratoryDashboard counts={counts} />
     </div>
   );
