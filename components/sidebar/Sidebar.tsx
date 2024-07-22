@@ -1,27 +1,11 @@
 "use client";
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-// import { logout } from '@/utils/api';
 import LogoutButton from '@/components/LogoutButton';
-
-import {
-  Home,
-  Calendar,
-  Users,
-  FileText,
-  Settings,
-  FlaskConical,
-  Clipboard,
-  Menu,
-  LogOut,
-  Activity,
-  ChevronLeft,
-  ChevronRight,
-  Building,
-} from "lucide-react";
+import { Home, Calendar, Users, FileText, Settings, FlaskConical, Clipboard, Menu, Activity, ChevronLeft, ChevronRight, Building } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import withAuth from '@/utils/withAuth';
 
 const navItems = [
   { icon: Home, text: "Dashboard", href: "/home/dashboard" },
@@ -29,11 +13,7 @@ const navItems = [
   { icon: Calendar, text: "Appointments", href: "/home/appointments" },
   { icon: Clipboard, text: "Medical Records", href: "/home/records" },
   { icon: Activity, text: "Vitals Monitoring", href: "/home/vitals" },
-  {
-    icon: FlaskConical,
-    text: "Laboratory Setup",
-    href: "/home/laboratory",
-  },
+  { icon: FlaskConical, text: "Laboratory Setup", href: "/home/laboratory" },
   { icon: FileText, text: "Reports", href: "/home/reports" },
   { icon: Settings, text: "Administration", href: "/home/administration" },
   { icon: Building, text: "Staff Management", href: "/home/hr" },
@@ -44,7 +24,7 @@ interface SidebarProps {
   setIsCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
+const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, setIsCollapsed }) => {
   const pathname = usePathname();
   const [isMobile, setIsMobile] = useState(false);
 
@@ -63,13 +43,6 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
   };
 
   const router = useRouter();
-
-  // const handleLogout = () => {
-  //   if (window.confirm("Are you sure you want to log out?")) {
-  //     logout();
-  //     router.push("/auth/login");
-  //   }
-  // };
 
   return (
     <div
@@ -120,11 +93,8 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
           className={`flex items-center px-4 py-3 w-full text-left hover:bg-blue-50 transition-colors ${
             isCollapsed ? "justify-center" : ""
           }`}
-         
         >
-          <Menu
-            className={`w-5 h-5 text-gray-600 ${isCollapsed ? "" : "mr-3"}`}
-          />
+          <Menu className={`w-5 h-5 text-gray-600 ${isCollapsed ? "" : "mr-3"}`} />
           {!isCollapsed && <span className="font-medium">Menu</span>}
         </a>
         <LogoutButton isCollapsed={isCollapsed} />
@@ -139,4 +109,6 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
       )}
     </div>
   );
-}
+};
+
+export default withAuth(Sidebar);
