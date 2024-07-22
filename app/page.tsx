@@ -1,7 +1,26 @@
+import React from 'react';
 import Link from "next/link";
 import { FaStethoscope, FaUserMd, FaHospital } from "react-icons/fa";
 
-export default function Home() {
+interface FeatureCardProps {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}
+
+const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description }) => {
+  return (
+    <div className="bg-white bg-opacity-20 p-6 rounded-lg">
+      <div className="flex justify-center mb-4">
+        {icon}
+      </div>
+      <h3 className="text-xl font-semibold mb-2">{title}</h3>
+      <p>{description}</p>
+    </div>
+  );
+}
+
+const Home: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-500 to-cyan-500 text-white">
       <nav className="p-4">
@@ -48,14 +67,4 @@ export default function Home() {
   );
 }
 
-function FeatureCard({ icon, title, description }) {
-  return (
-    <div className="bg-white bg-opacity-20 p-6 rounded-lg">
-      <div className="flex justify-center mb-4">
-        {icon}
-      </div>
-      <h3 className="text-xl font-semibold mb-2">{title}</h3>
-      <p>{description}</p>
-    </div>
-  );
-}
+export default Home;

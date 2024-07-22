@@ -1,41 +1,67 @@
 "use client"
-import React, { ComponentType } from 'react';
-import { NextPage } from 'next';
-import { useRouter } from 'next/router';
+
+import React, { ComponentType, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { isAuthenticated } from './api';
 
-export function withAuth<P extends object>(
-  WrappedComponent: ComponentType<P>
-): NextPage<P> {
-  const WithAuth: NextPage<P> = (props: P) => {
-    const [mounted, setMounted] = React.useState(false);
+const spinnerStyle: React.CSSProperties = {
+  display: 'inline-block',
+  width: '50px',
+  height: '50px',
+  border: '3px solid rgba(0, 0, 0, 0.3)',
+  borderRadius: '50%',
+  borderTop: '3px solid #007bff',
+  animation: 'spin 1s linear infinite',
+};
 
-    React.useEffect(() => {
-      setMounted(true);
+const containerStyle: React.CSSProperties = {
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  height: '100vh',
+};
+
+export function withAuth<P extends object>(WrappedComponent: ComponentType<P>) {
+  return function WithAuth(props: P) {
+    const router = useRouter();
+    const [isChecking, setIsChecking] = useState(true);
+
+    useEffect(() => {
+      const checkAuth = async () => {
+        if (!await isAuthenticated()) {
+          router.push('/auth/login');
+        } else {
+          setIsChecking(false);
+        }
+      };
+
+      checkAuth();
+    }, [router]);
+
+    useEffect(() => {
+      // Add keyframes to the document
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `;
+      document.head.appendChild(style);
+
+      return () => {
+        document.head.removeChild(style);
+      };
     }, []);
 
-    React.useEffect(() => {
-      if (mounted && !isAuthenticated()) {
-        // Only import and use router on the client side
-        const { push } = require('next/router');
-        push('/auth/login');
-      }
-    }, [mounted]);
-
-    // Don't render anything on the server or before mounting
-    if (!mounted) {
-      return null;
+    if (isChecking) {
+      return React.createElement('div', { style: containerStyle },
+        React.createElement('div', { style: spinnerStyle })
+      );
     }
 
     return React.createElement(WrappedComponent, props);
   };
-
-  // Copy getInitialProps so it will run as well
-  if ((WrappedComponent as any).getInitialProps) {
-    WithAuth.getInitialProps = (WrappedComponent as any).getInitialProps;
-  }
-
-  return WithAuth;
 }
 
 export default withAuth;

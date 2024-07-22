@@ -91,7 +91,7 @@ function LabTestClassesPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
-        <h2 className="text-3xl font-semibold">Lab Test Classes</h2>
+        <h2 className="text-3xl font-semibold text-slate-950">Lab Test Classes</h2>
         <div className="space-x-4">
           <Link
             className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors duration-300 inline-flex items-center"
