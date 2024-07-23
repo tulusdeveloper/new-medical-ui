@@ -8,12 +8,12 @@ import debounce from "lodash/debounce";
 import withAuth from '@/utils/withAuth';
 import { laboratoryApi } from '@/utils/api';
 
-interface LabTestClass {
+export interface LabTestClass {
   id: number;
   name: string;
   description: string;
   is_active: boolean;
-  category?: string;
+  category: string;
 }
 
 function LabTestClassesPage() {
@@ -39,7 +39,7 @@ function LabTestClassesPage() {
           name: cls.name,
           description: cls.description || '',
           is_active: cls.is_active ?? true,
-          category: cls.category
+          category: cls.category || ''
         }));
       setLabTestClasses(processedData);
       setError(null);
@@ -51,7 +51,6 @@ function LabTestClassesPage() {
       setIsLoading(false);
     }
   };
-
 
   const handleEdit = (labTestClass: LabTestClass) => {
     setSelectedLabTestClass(labTestClass);

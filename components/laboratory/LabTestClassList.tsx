@@ -29,7 +29,7 @@ const LabTestClassList: React.FC<LabTestClassListProps> = ({ labTestClasses, onE
   }
 
   const groupedClasses = labTestClasses.reduce((acc: Record<string, LabTestClass[]>, labTestClass) => {
-    const group = labTestClass.category || 'Uncategorized';
+    const group = labTestClass.category || '';
     if (!acc[group]) acc[group] = [];
     acc[group].push(labTestClass);
     return acc;
@@ -47,14 +47,16 @@ const LabTestClassList: React.FC<LabTestClassListProps> = ({ labTestClasses, onE
     <div className="space-y-4">
       {Object.entries(groupedClasses).map(([group, classes]) => (
         <div key={group} className="bg-white shadow-md rounded-lg overflow-hidden">
-          <button
-            className="w-full bg-gray-100 px-4 py-3 text-left font-medium flex justify-between items-center"
-            onClick={() => toggleGroup(group)}
-          >
-            {group}
-            {expandedGroups[group] ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-          </button>
-          {expandedGroups[group] && (
+          {group && (
+            <button
+              className="w-full bg-gray-100 px-4 py-3 text-left font-medium flex justify-between items-center"
+              onClick={() => toggleGroup(group)}
+            >
+              {group}
+              {expandedGroups[group] ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+            </button>
+          )}
+          {(!group || expandedGroups[group]) && (
             <div className="overflow-x-auto">
               <table className="min-w-full">
                 <thead className="bg-gray-50">
