@@ -59,7 +59,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, setIsCollapsed }) => {
       >
         <Activity className="w-8 h-8 text-white" />
         {!isCollapsed && (
-          <span className="text-xl font-bold text-white ml-2">MediCare</span>
+          <span className="text-xl font-bold text-white ml-2">MedXpert</span>
         )}
       </Link>
       <nav className="flex-grow overflow-y-auto">

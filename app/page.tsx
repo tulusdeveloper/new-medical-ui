@@ -25,7 +25,7 @@ const Home: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-r from-blue-500 to-cyan-500 text-white">
       <nav className="p-4">
         <div className="container mx-auto flex justify-between items-center">
-          <h1 className="text-2xl font-bold">MediCare</h1>
+          <h1 className="text-2xl font-bold">MedXpert</h1>
           <Link href="/auth/login" className="bg-white text-blue-500 px-4 py-2 rounded-full hover:bg-blue-100 transition">
             Login
           </Link>
@@ -34,7 +34,7 @@ const Home: React.FC = () => {
 
       <main className="container mx-auto mt-16 px-4">
         <div className="text-center">
-          <h2 className="text-5xl font-bold mb-4">Welcome to MediCare</h2>
+          <h2 className="text-5xl font-bold mb-4">Welcome to MedXpert</h2>
           <p className="text-xl mb-8">Advanced Medical Management System</p>
           <Link href="/home/dashboard/" className="bg-white text-blue-500 px-6 py-3 rounded-full text-lg font-semibold hover:bg-blue-100 transition">
             View Dashboard
@@ -61,7 +61,7 @@ const Home: React.FC = () => {
       </main>
 
       <footer className="mt-16 text-center py-4">
-        <p>&copy; 2024 MediCare. All rights reserved.</p>
+        <p>&copy; 2024 MedXpert. All rights reserved.</p>
       </footer>
     </div>
   );

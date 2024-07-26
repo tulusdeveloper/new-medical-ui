@@ -60,7 +60,7 @@ export default function Login() {
               Welcome back
             </h2>
             <p className="mt-2 text-sm text-gray-600">
-              Sign in to access your MediCare dashboard
+              Sign in to access your MedXpert dashboard
             </p>
           </div>
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>

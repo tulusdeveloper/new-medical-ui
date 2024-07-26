@@ -188,7 +188,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-4xl font-bold text-gray-800 mb-6">MediCare Dashboard</h1>
+      <h1 className="text-4xl font-bold text-gray-800 mb-6">MedXpert Dashboard</h1>
       <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
         <KPICard icon={<FaFlask />} title="Lab Tests" value={stats.labStats.totalTests} subtitle="Total Tests" />
         <KPICard icon={<FaUserInjured />} title="Patients" value={stats.patientStats.totalPatients} subtitle="Total Patients" />
