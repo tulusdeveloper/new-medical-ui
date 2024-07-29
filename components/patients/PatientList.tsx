@@ -1,12 +1,12 @@
 "use client"
 import React, { useState, useEffect, useMemo } from 'react'
 import { patientsApi } from '@/utils/api'
-import { Search, UserPlus, Edit, X, ChevronDown, ChevronUp, ChevronRight } from 'lucide-react'
+import { Search, UserPlus, Edit, X, ChevronRight, ChevronLeft, ChevronsLeft, ChevronsRight } from 'lucide-react'
 import Link from 'next/link'
 import debounce from 'lodash/debounce'
 import withAuth from '@/utils/withAuth'
 import { useRouter } from 'next/navigation'
-import PatientFormModal from './PatientFormModal' // Make sure to create this component
+import PatientFormModal from './PatientFormModal'
 
 interface Patient {
   id: string;
@@ -28,10 +28,11 @@ function PatientList() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
-  const [expandedGroups, setExpandedGroups] = useState<{[key: string]: boolean}>({})
   const [expandedDetails, setExpandedDetails] = useState<{[key: string]: boolean}>({})
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedPatient, setSelectedPatient] = useState<Patient | undefined>(undefined)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [patientsPerPage] = useState(10)
   const router = useRouter()
 
   useEffect(() => {
@@ -88,46 +89,41 @@ function PatientList() {
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     debouncedSearch(e.target.value)
+    setCurrentPage(1)
   }
 
   const clearSearch = () => {
     setSearchTerm("")
+    setCurrentPage(1)
     const searchInput = document.getElementById("search-input") as HTMLInputElement;
     if (searchInput) {
       searchInput.value = ""
     }
   }
 
-  const filteredPatients = useMemo(() => {
-    return patients.filter((patient) =>
-      `${patient.first_name} ${patient.other_names} ${patient.last_name}`
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      patient.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      patient.primary_phone.includes(searchTerm)
-    )
+  const sortedAndFilteredPatients = useMemo(() => {
+    return patients
+      .filter((patient) =>
+        `${patient.first_name} ${patient.other_names} ${patient.last_name}`
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+        patient.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        patient.primary_phone.includes(searchTerm)
+      )
+      .sort((a, b) => `${a.last_name} ${a.first_name}`.localeCompare(`${b.last_name} ${b.first_name}`))
   }, [patients, searchTerm])
-
-  const groupedPatients = useMemo(() => {
-    return filteredPatients.reduce((acc: {[key: string]: Patient[]}, patient) => {
-      const group = patient.last_name[0].toUpperCase();
-      if (!acc[group]) acc[group] = [];
-      acc[group].push(patient);
-      return acc;
-    }, {});
-  }, [filteredPatients]);
-
-  const sortedGroups = useMemo(() => {
-    return Object.keys(groupedPatients).sort();
-  }, [groupedPatients]);
-
-  const toggleGroup = (group: string) => {
-    setExpandedGroups(prev => ({...prev, [group]: !prev[group]}));
-  };
 
   const toggleDetails = (id: string) => {
     setExpandedDetails(prev => ({...prev, [id]: !prev[id]}));
   };
+
+  // Pagination
+  const indexOfLastPatient = currentPage * patientsPerPage;
+  const indexOfFirstPatient = indexOfLastPatient - patientsPerPage;
+  const currentPatients = sortedAndFilteredPatients.slice(indexOfFirstPatient, indexOfLastPatient);
+  const totalPages = Math.ceil(sortedAndFilteredPatients.length / patientsPerPage);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -156,10 +152,10 @@ function PatientList() {
           type="text"
           placeholder="Search patients..."
           onChange={handleSearchChange}
-          className="w-full pl-10 pr-10 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full pl-10 pr-10 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800"
         />
         <Search
-          className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+          className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 "
           size={20}
         />
         {searchTerm && (
@@ -188,99 +184,131 @@ function PatientList() {
           </button>
         </div>
       ) : (
-        <div className="space-y-4">
-          {sortedGroups.map(group => (
-            <div key={group} className="bg-white shadow-md rounded-lg overflow-hidden">
-              <button
-                className="w-full bg-gray-100 px-4 py-3 text-left font-medium flex justify-between items-center text-gray-800"
-                onClick={() => toggleGroup(group)}
-              >
-                Last Name: {group}
-                {expandedGroups[group] ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-              </button>
-              {expandedGroups[group] && (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+        <div className="bg-white shadow-md rounded-lg overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  {['Name', 'Gender', 'Date of Birth', 'Phone', 'Email', 'Blood Type', 'Actions'].map((header, index) => (
+                    <th 
+                      key={index}
+                      scope="col" 
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      {header}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {currentPatients.map(patient => (
+                  <React.Fragment key={patient.id}>
+                    <tr className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">{`${patient.last_name}, ${patient.first_name} ${patient.other_names}`}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{patient.gender}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{new Date(patient.date_of_birth).toLocaleDateString()}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{patient.primary_phone}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{patient.email}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{patient.blood_type || 'N/A'}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button 
+                          onClick={() => toggleDetails(patient.id)} 
+                          className="text-blue-600 hover:text-blue-900 mr-2"
+                        >
+                          <ChevronRight className={`inline mr-1 transform transition-transform ${expandedDetails[patient.id] ? 'rotate-90' : ''}`} size={16} /> 
+                          {expandedDetails[patient.id] ? 'Hide' : 'View'}
+                        </button>
+                        <button 
+                          onClick={() => handleOpenModal(patient)} 
+                          className="text-indigo-600 hover:text-indigo-900"
+                        >
+                          <Edit className="inline mr-1" size={16} /> Edit
+                        </button>
+                      </td>
+                    </tr>
+                    {expandedDetails[patient.id] && (
                       <tr>
-                        {['Name', 'Gender', 'Date of Birth', 'Phone', 'Email', 'Blood Type', 'Actions'].map((header, index) => (
-                          <th 
-                            key={index}
-                            scope="col" 
-                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                          >
-                            {header}
-                          </th>
-                        ))}
+                        <td colSpan={7} className="bg-gray-50 px-6 py-4 text-gray-800">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <p><strong>Address:</strong> {patient.address || 'N/A'}</p>
+                              <p><strong>Emergency Contact:</strong> {patient.emergency_contact || 'N/A'}</p>
+                            </div>
+                            <div>
+                              <p><strong>Medical History:</strong> {patient.medical_history || 'N/A'}</p>
+                            </div>
+                          </div>
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {groupedPatients[group].map(patient => (
-                        <React.Fragment key={patient.id}>
-                          <tr className="hover:bg-gray-50">
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm font-medium text-gray-900">{`${patient.last_name}, ${patient.first_name} ${patient.other_names}`}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm text-gray-900">{patient.gender}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm text-gray-900">{new Date(patient.date_of_birth).toLocaleDateString()}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm text-gray-900">{patient.primary_phone}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm text-gray-900">{patient.email}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm text-gray-900">{patient.blood_type || 'N/A'}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                              <button 
-                                onClick={() => toggleDetails(patient.id)} 
-                                className="text-blue-600 hover:text-blue-900 mr-2"
-                              >
-                                <ChevronRight className={`inline mr-1 transform transition-transform ${expandedDetails[patient.id] ? 'rotate-90' : ''}`} size={16} /> 
-                                {expandedDetails[patient.id] ? 'Hide' : 'View'}
-                              </button>
-                              <button 
-                                onClick={() => handleOpenModal(patient)} 
-                                className="text-indigo-600 hover:text-indigo-900"
-                              >
-                                <Edit className="inline mr-1" size={16} /> Edit
-                              </button>
-                            </td>
-                          </tr>
-                          {expandedDetails[patient.id] && (
-                            <tr>
-                              <td colSpan={7} className="bg-gray-50 px-6 py-4 text-gray-800">
-                                <div className="grid grid-cols-2 gap-4">
-                                  <div>
-                                    <p><strong>Address:</strong> {patient.address || 'N/A'}</p>
-                                    <p><strong>Emergency Contact:</strong> {patient.emergency_contact || 'N/A'}</p>
-                                  </div>
-                                  <div>
-                                    <p><strong>Medical History:</strong> {patient.medical_history || 'N/A'}</p>
-                                  </div>
-                                </div>
-                              </td>
-                            </tr>
-                          )}
-                        </React.Fragment>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          ))}
+                    )}
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
-      {Object.values(groupedPatients).flat().length === 0 && !isLoading && !error && (
+      {sortedAndFilteredPatients.length === 0 && !isLoading && !error && (
         <div className="text-center py-4 text-gray-500">
           No patients found matching your search.
+        </div>
+      )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-4 space-x-2">
+          <button
+            onClick={() => paginate(1)}
+            disabled={currentPage === 1}
+            className="px-3 py-1 rounded bg-gray-200 text-gray-700 disabled:opacity-50"
+          >
+            <ChevronsLeft size={20} />
+          </button>
+          <button
+            onClick={() => paginate(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-3 py-1 rounded bg-gray-200 text-gray-700 disabled:opacity-50"
+          >
+            <ChevronLeft size={20} />
+          </button>
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
+            <button
+              key={number}
+              onClick={() => paginate(number)}
+              className={`px-3 py-1 rounded ${
+                currentPage === number ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
+              }`}
+            >
+              {number}
+            </button>
+          ))}
+          <button
+            onClick={() => paginate(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="px-3 py-1 rounded bg-gray-200 text-gray-700 disabled:opacity-50"
+          >
+            <ChevronRight size={20} />
+          </button>
+          <button
+            onClick={() => paginate(totalPages)}
+            disabled={currentPage === totalPages}
+            className="px-3 py-1 rounded bg-gray-200 text-gray-700 disabled:opacity-50"
+          >
+            <ChevronsRight size={20} />
+          </button>
         </div>
       )}
 

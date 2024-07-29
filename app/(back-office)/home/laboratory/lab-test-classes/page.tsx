@@ -39,7 +39,7 @@ function LabTestClassesPage() {
           name: cls.name,
           description: cls.description || '',
           is_active: cls.is_active ?? true,
-          category: cls.category || ''
+          category: cls.category || '' 
         }));
       setLabTestClasses(processedData);
       setError(null);
